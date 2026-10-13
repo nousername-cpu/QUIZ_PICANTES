@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="dark">
+<title>Quiz +18</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0c0b10; --paper:#f5f0ea; --muted:#bdb4c2; --line:rgba(255,255,255,.16);
+  --accent:#d63c66; --accent-hi:#ec5a82; --danger:#ff9a9a; --ok:#86e3ab;
+  --glass:rgba(16,13,20,.68);
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100dvh;background:var(--ink);color:var(--paper);font:400 16px/1.5 var(--sans);
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+
+/* ---------- Fundo ---------- */
+#bg{position:fixed;inset:0;z-index:-3;background:radial-gradient(1100px 700px at 15% -10%,#2a1a33,transparent),var(--ink)}
+#bg .layer{position:absolute;inset:0;background:center/cover no-repeat;opacity:0;transition:opacity .9s ease}
+#bg .layer.on{opacity:1}
+#shade{position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,rgba(8,6,12,.55),rgba(8,6,12,.84));transition:opacity .5s ease}
+body.focus #shade{opacity:.08}
+body.focus{cursor:pointer}
+
+/* ---------- Topo ---------- */
+.top{position:fixed;top:0;left:0;right:0;z-index:5;padding-top:env(safe-area-inset-top);background:rgba(12,11,16,.72);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);transition:opacity .35s ease}
+.top .in{max-width:1000px;margin:0 auto;display:flex;align-items:center;gap:20px;padding:0 clamp(14px,4vw,28px);min-height:60px}
+.brand{font:700 1.2rem/1 var(--serif);letter-spacing:.01em;white-space:nowrap}
+.menu{display:flex;gap:4px;margin:0 auto 0 8px;overflow-x:auto;scrollbar-width:none}
+.menu::-webkit-scrollbar{display:none}
+.menu button{appearance:none;background:none;border:0;border-radius:8px;padding:9px 13px;font:600 .92rem var(--sans);color:var(--muted);cursor:default;white-space:nowrap;position:relative}
+.menu button.done{cursor:pointer;color:var(--paper)}
+.menu button.done:hover{background:rgba(255,255,255,.08)}
+.menu button.cur{color:var(--paper);cursor:default}
+.menu button.cur::after{content:"";position:absolute;left:13px;right:13px;bottom:2px;height:2px;border-radius:2px;background:var(--accent-hi)}
+@media(max-width:640px){
+  .top .in{flex-wrap:wrap;gap:0;padding-bottom:4px}
+  .brand{padding:16px 0 6px}
+  #btnFoto{margin-left:auto}
+  .menu{order:3;width:100%;margin:0}
+}
+body.focus .top,body.focus .card,body.focus .foot{opacity:0;visibility:hidden;pointer-events:none}
+
+/* ---------- Layout ---------- */
+.stage{min-height:100dvh;display:grid;place-items:center;padding:130px clamp(12px,4vw,24px) 60px}
+@media(min-width:641px){.stage{padding-top:100px}}
+.card{width:min(660px,100%);background:var(--glass);border:1px solid var(--line);border-radius:18px;
+  padding:clamp(20px,4vw,34px);backdrop-filter:blur(16px) saturate(120%);-webkit-backdrop-filter:blur(16px) saturate(120%);
+  box-shadow:0 28px 70px rgba(0,0,0,.5);transition:opacity .35s ease,visibility .35s}
+.foot{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:0;right:0;text-align:center;font-size:.78rem;color:var(--muted);transition:opacity .35s}
+
+.meta{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;font-size:.85rem;color:var(--muted)}
+.bar{height:4px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin-bottom:26px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-hi));transition:width .35s ease}
+
+h1,h2,h3{font-family:var(--serif);font-weight:700;margin:0}
+h2{font-size:clamp(1.4rem,3.6vw,1.85rem);line-height:1.22;margin-bottom:20px;outline:none}
+h3{font-size:1.1rem;margin:26px 0 10px}
+p{margin:0 0 12px}
+.lead{color:var(--muted)}
+.small{font-size:.85rem;color:var(--muted)}
+
+/* ---------- Botões ---------- */
+.btn{appearance:none;font:600 .98rem/1 var(--sans);color:var(--paper);background:rgba(255,255,255,.08);border:1px solid var(--line);
+  border-radius:12px;padding:14px 20px;min-height:48px;cursor:pointer;transition:background .2s,border-color .2s,transform .06s}
+.btn:hover{background:rgba(255,255,255,.14)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-hi);border-color:var(--accent-hi)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sm{min-height:38px;padding:9px 14px;font-size:.88rem;border-radius:99px}
+.link{appearance:none;background:none;border:0;color:var(--muted);font:600 .92rem var(--sans);padding:12px 8px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.link:hover{color:var(--paper)}
+:focus-visible{outline:2px solid var(--accent-hi);outline-offset:2px}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px}
+.nav .right{display:flex;align-items:center;gap:6px}
+
+/* ---------- Tela +18 ---------- */
+.gate{text-align:center}
+.gate .big{font:700 clamp(4rem,16vw,6.5rem)/1 var(--serif);margin:6px 0 10px;color:var(--accent-hi)}
+.gate .nav{justify-content:center;flex-wrap:wrap;margin-top:26px}
+
+/* ---------- Formulário ---------- */
+.form{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:560px){.form{grid-template-columns:1fr 1fr}}
+.field label,.field .lab{display:block;font-size:.85rem;font-weight:600;color:var(--muted);margin-bottom:6px}
+.input{width:100%;font:500 1rem var(--sans);color:var(--paper);background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:13px 14px;min-height:48px}
+.input::placeholder{color:rgba(255,255,255,.35)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{appearance:none;font:600 .92rem var(--sans);color:var(--paper);background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:99px;padding:10px 16px;min-height:44px;cursor:pointer}
+.chip[aria-checked="true"]{background:rgba(214,60,102,.28);border-color:var(--accent-hi)}
+.err{color:var(--danger);font-size:.82rem;margin-top:5px}
+
+/* ---------- Escolha de modo ---------- */
+.modes{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:560px){.modes{grid-template-columns:1fr 1fr}}
+.mode{appearance:none;text-align:left;font:inherit;color:var(--paper);background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;
+  padding:20px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:background .2s,border-color .2s,transform .06s}
+.mode:hover{background:rgba(255,255,255,.11);border-color:var(--accent-hi)}
+.mode:active{transform:scale(.99)}
+.mode b{font:700 1.3rem/1.1 var(--serif)}
+.mode .n{font-size:.9rem;color:var(--accent-hi);font-weight:700}
+.mode span.d{font-size:.9rem;color:var(--muted)}
+.form3{display:grid;gap:12px;grid-template-columns:repeat(3,1fr)}
+@media(max-width:420px){.form3{grid-template-columns:1fr 1fr}.form3 .field:first-child{grid-column:1/-1}}
+
+/* ---------- Perguntas ---------- */
+.options{display:grid;gap:10px}
+.option{appearance:none;display:flex;align-items:center;gap:14px;text-align:left;width:100%;font:600 1rem/1.35 var(--sans);color:var(--paper);
+  background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:12px;padding:14px 16px;min-height:58px;cursor:pointer;
+  transition:background .2s,border-color .2s,transform .06s}
+.option:hover{background:rgba(255,255,255,.11)}
+.option:active{transform:scale(.995)}
+.option .k{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:.82rem;border:1px solid var(--line);color:var(--muted)}
+.option.sel{background:rgba(214,60,102,.22);border-color:var(--accent-hi)}
+.option.sel .k{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ---------- Resultado ---------- */
+.pct{display:grid;gap:14px;margin:6px 0 4px}
+.pct .row{display:flex;justify-content:space-between;font-weight:600;margin-bottom:6px}
+.pct .track{height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+.pct .track i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-hi));width:0;transition:width .8s ease}
+.status{font-size:.9rem;min-height:1.4em;margin:10px 0 0;color:var(--muted)}
+.status.ok{color:var(--ok)}.status.err{color:var(--danger)}
+dl.data{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0}
+dl.data dt{color:var(--muted)}dl.data dd{margin:0;font-weight:600}
+details{margin-top:18px;border:1px solid var(--line);border-radius:12px;padding:4px 16px;background:rgba(255,255,255,.04)}
+summary{cursor:pointer;font-weight:600;padding:12px 0}
+details ol{margin:0 0 12px;padding-left:20px;display:grid;gap:10px}
+details li em{color:var(--muted);font-style:normal}
+.box{margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+.row-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.fname{font-size:.88rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+
+/* ---------- Modo foto ---------- */
+#focusBar{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6;display:flex;gap:8px;padding:8px;
+  background:var(--glass);border:1px solid var(--line);border-radius:99px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);cursor:default}
+
+@media(max-width:480px){
+  .nav{flex-wrap:wrap}
+  .nav .right{margin-left:auto}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body data-stage="age">
+
+<div id="bg" aria-hidden="true"><div class="layer"></div><div class="layer"></div></div>
+<div id="shade" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="in">
+    <div class="brand" id="brand">Quiz +18</div>
+    <nav class="menu" id="menu" aria-label="Etapas">
+      <button type="button" data-go="age">Início</button>
+      <button type="button" data-go="mode">Modo</button>
+      <button type="button" data-go="intro">Dados</button>
+      <button type="button" data-go="quiz">Perguntas</button>
+      <button type="button" data-go="result">Resultado</button>
+    </nav>
+    <button id="btnFoto" class="btn sm" type="button" aria-pressed="false" hidden>Ver foto</button>
+  </div>
+</header>
+
+<main class="stage">
+  <section class="card" id="card" aria-label="Quiz">
+    <div class="meta"><span id="stepLabel">Maiores de 18</span></div>
+    <div class="bar" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="100"><i id="progress"></i></div>
+
+    <!-- 1. Confirmação de idade -->
+    <div id="s-age" class="gate">
+      <div class="big">+18</div>
+      <h2 style="margin-bottom:10px">Conteúdo para maiores de 18 anos</h2>
+      <p class="lead">Este quiz é recreativo e as porcentagens do resultado são aproximadas, sem valor científico.</p>
+      <p class="small">Ao continuar, você concorda que suas respostas, e uma estimativa automática feita a partir delas, serão enviadas a quem organizou o quiz.</p>
+      <div class="nav">
+        <button id="btnAgeExit" class="btn" type="button">Sair</button>
+        <button id="btnAgeOk" class="btn primary" type="button">Tenho 18 anos ou mais</button>
+      </div>
+    </div>
+
+    <!-- 2. Modo -->
+    <div id="s-mode" hidden>
+      <h2>Como você quer responder?</h2>
+      <div class="modes">
+        <button class="mode" type="button" data-modo="compacto">
+          <span class="n" id="nCompacto"></span><b>Compacto</b><span class="d">Gostos e preferências principais, sem enrolação.</span>
+        </button>
+        <button class="mode" type="button" data-modo="completo">
+          <span class="n" id="nCompleto"></span><b>Completo</b><span class="d">Todas as perguntas, com mais detalhes.</span>
+        </button>
+      </div>
+      <div class="nav"><button id="btnModeBack" class="btn" type="button">Voltar</button></div>
+    </div>
+
+    <!-- 3. Dados -->
+    <div id="s-intro" hidden>
+      <h2>Seus dados</h2>
+      <div class="form">
+        <div class="field">
+          <label for="apelido">Apelido</label>
+          <input id="apelido" class="input" type="text" placeholder="Como quer ser chamado(a)" autocomplete="off" maxlength="40">
+        </div>
+        <div class="field">
+          <span class="lab" id="labGenero">Gênero</span>
+          <div id="generoChips" class="chips" role="radiogroup" aria-labelledby="labGenero"></div>
+          <div id="errGenero" class="err" hidden>Selecione uma opção.</div>
+        </div>
+      </div>
+      <div class="form3" style="margin-top:14px">
+        <div class="field">
+          <label for="idade">Idade</label>
+          <input id="idade" class="input" type="number" min="18" max="120" inputmode="numeric" placeholder="28">
+          <div id="errIdade" class="err" hidden>18 ou mais.</div>
+        </div>
+        <div class="field">
+          <label for="altura">Altura (cm)</label>
+          <input id="altura" class="input" type="number" min="50" max="250" inputmode="numeric" placeholder="172">
+          <div id="errAltura" class="err" hidden>Informe em cm.</div>
+        </div>
+        <div class="field">
+          <label for="peso">Peso (kg)</label>
+          <input id="peso" class="input" type="number" min="20" max="400" inputmode="decimal" placeholder="70">
+          <div id="errPeso" class="err" hidden>Peso inválido.</div>
+        </div>
+      </div>
+      <div class="nav">
+        <button id="btnIntroBack" class="btn" type="button">Voltar</button>
+        <button id="btnStart" class="btn primary" type="button">Começar</button>
+      </div>
+    </div>
+
+    <!-- 4. Perguntas -->
+    <div id="s-quiz" hidden>
+      <h2 id="question" tabindex="-1"></h2>
+      <div id="options" class="options" role="radiogroup" aria-labelledby="question"></div>
+      <div class="nav">
+        <button id="btnBack" class="btn" type="button">Voltar</button>
+        <div class="right">
+          <button id="btnSkip" class="link" type="button">Pular</button>
+          <button id="btnNext" class="btn primary" type="button" disabled>Avançar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Resultado -->
+    <div id="s-result" hidden aria-live="polite">
+      <h2 id="resTitle">Pronto!</h2>
+      <p id="finalMessage" class="lead"></p>
+      <div id="sendStatus" class="status" role="status"></div>
+      <button id="btnRetry" class="btn sm" type="button" hidden style="margin-top:8px">Tentar enviar de novo</button>
+
+      <h3>Resultado estimado</h3>
+      <div id="pct" class="pct"></div>
+
+      <details>
+        <summary>Ver minhas respostas</summary>
+        <dl id="userData" class="data" style="margin-bottom:14px"></dl>
+        <ol id="answers"></ol>
+      </details>
+
+      <div class="box" id="uploadBox">
+        <h3 style="margin-top:0">Enviar um arquivo <span class="small" style="font-family:var(--sans);font-weight:400">(opcional)</span></h3>
+        <p class="small">Imagem, vídeo ou PDF de até <span id="maxMB">8</span> MB. O arquivo vai direto para quem organizou o quiz.</p>
+        <input id="fileInput" type="file" accept="image/*,video/*,application/pdf" hidden>
+        <div class="row-actions">
+          <button id="btnPick" class="btn" type="button">Escolher arquivo</button>
+          <button id="btnUpload" class="btn primary" type="button" disabled>Enviar arquivo</button>
+        </div>
+        <div id="fileName" class="fname" style="margin-top:8px"></div>
+        <div id="uploadStatus" class="status" role="status"></div>
+      </div>
+
+      <div class="nav">
+        <button id="btnRestart" class="btn" type="button">Refazer o quiz</button>
+        <button id="btnWhats" class="btn primary" type="button">Abrir WhatsApp</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="foot">Conteúdo +18 · Uso recreativo</div>
+
+<div id="focusBar" hidden>
+  <button id="fbPrev" class="btn sm" type="button" aria-label="Foto anterior">‹ Anterior</button>
+  <button id="fbBack" class="btn sm primary" type="button">Voltar ao quiz</button>
+  <button id="fbNext" class="btn sm" type="button" aria-label="Próxima foto">Próxima ›</button>
+</div>
+
+<script>
+// ==========================================================
+// CONFIGURAÇÃO — edite só esta parte
+// ==========================================================
+const SNT=["Sim","Não","Talvez"], SNS=["Sim","Não","Sempre"], SNG=["Sim","Não","Gostaria"],
+      TOPO=["Topo","Não topo","Depende de quem/como"], FANT=["Topa e gosta de inventar","Não é minha praia","Talvez, se rolar"];
+const Q=(texto,opcoes,c)=>({texto,opcoes,c:!!c});
+
+const CFG={
+  titulo:"Quiz +18",
+  finalMessage:"Obrigado por responder!",
+  percentLabels:["Safado(a)","Santo(a)","Indiferente"],
+
+  // Envio para planilha + e-mail (o e-mail fica configurado no Google Apps Script, veja Code.gs)
+  sheetWebAppURL:"https://script.google.com/macros/s/AKfycbxJ2j4PJyHmUWC4rcefgCjEVMvAhpEvMo3VOoLsYcHOJQ2L7bS_CLDE70E1Gixr5KQ/exec",
+  maxArquivoMB:8,
+
+  usarWhatsApp:true,
+  whatsappNumber:"",            // só dígitos com DDI; vazio = a pessoa escolhe o contato
+  firstMessage:"Oi! Quero participar do quiz. Pode me atender?",
+
+  // Fotos de fundo: home.jpg (capa) + bg001, bg002... na mesma pasta do index.html
+  fotos:{ pasta:".", total:240, exts:["webp","jpg","jpeg","png"],
+          capa:["home.webp","home.jpg","home.jpeg","home.png"], trocarACada:1 },
+
+  // false = esconde o envio de arquivo no site (o código continua aqui e no Code.gs; mude para true para reativar)
+  permitirArquivo:false,
+
+  generos:["Homem","Mulher"],
+
+  // Estimativa automática (só vai para a planilha/e-mail, não aparece para quem responde).
+  // v = valor de 0 a 1 para cada opção, na ordem em que ela aparece; peso = importância; g = só para esse gênero.
+  indicador:[
+    {q:"Já teve experiências bi?",                        v:[1,0,.5],  peso:3},
+    {q:"Já saiu com gay ou bi, ou sairia?",               v:[1,0,.5],  peso:2},
+    {q:"Já saiu com trans, ou sairia?",                   v:[1,0,.5],  peso:1},
+    {q:"Transa a três sendo dois homens e uma mulher:",   v:[1,0,.4],  peso:1, g:"Homem"},
+    {q:"Transa a três sendo duas mulheres e um homem:",   v:[1,0,.4],  peso:1, g:"Mulher"}
+  ],
+
+  // Perguntas de "dote": aparecem logo no início, conforme o gênero escolhido
+  dote:{
+    "Homem":[
+      Q("Qual o tamanho do seu pênis?",["Entre 15 cm e 17 cm","Entre 18 cm e 19 cm","Maior que 20 cm"]),
+      Q("Qual a espessura?",["Fina","Grossa","Normal"])
+    ],
+    "Mulher":[
+      Q("Qual o tamanho dos seus seios?",["Pequenos","Médios","Grandes"]),
+      Q("Qual o tamanho do seu bumbum?",["Pequeno","Médio","Grande"]),
+      Q("Pelos íntimos:",["Depilada","Aparadinha","Natural"])
+    ]
+  },
+
+  perguntas:[
+    // ----- Gostos e preferências -----
+    Q("Prefere começar com:",["Beijos e carinho","Conversa safada","Direto ao ponto"],1),
+    Q("Onde mais gosta de ser beijado(a)?",["Boca","Pescoço e orelha","Barriga e coxas"],1),
+    Q("Quanto tempo de preliminares você gosta?",["Pouco","Bastante","Depende do dia"],1),
+    Q("O que mais te excita?",["Conversa e clima","Toque e carinho","Visual e fantasia"],1),
+    Q("Sexo oral: o que prefere?",["Fazer","Receber","Os dois igual"],1),
+    Q("Ritmo preferido:",["Lento e sensual","Intenso e forte","Começa leve e acelera"],1),
+    Q("Gosta de falar sacanagem durante?",["Adoro","Um pouco","Prefiro silêncio"],1),
+    Q("Tapas e puxões de cabelo:",["Gosto","Só leves","Não curto"],1),
+    Q("Algemas, cordas ou amarras:",["Topo amarrar","Topo ser amarrado(a)","Não curto"],1),
+    Q("Venda nos olhos:",["Curto","Topo testar","Não curto"],1),
+    Q("Dominação:",["Gosto de mandar","Gosto de obedecer","Gosto de alternar"],1),
+    Q("Roleplay (personagens e fantasias):",["Adoro","Topo se for divertido","Não é pra mim"],1),
+    Q("Lingerie ou roupas especiais:",["Me excita","Tanto faz","Prefiro sem nada"],1),
+    Q("Sexo em lugares inusitados:",["Adoro o risco","Só em lugar seguro","Prefiro a cama"],1),
+    Q("Sexo ao ar livre:",["Já fiz e curti","Tenho vontade","Não curto"],1),
+    Q("Massagem erótica:",["Dar e receber","Só receber","Só dar"],1),
+    Q("Sexting e áudios safados:",["Curto muito","De vez em quando","Evito"],1),
+    Q("Chamada de vídeo íntima:",["Já fiz","Toparia","Não faço"],1),
+    Q("Exibicionismo (se mostrar):",["Me excita","Só pra quem confio","Não curto"],1),
+    Q("Voyeurismo (observar):",["Me excita","Só se for combinado","Não curto"],1),
+    Q("Sexo anal:",["Gosto","Topo com calma","Não curto"],1),
+    Q("Fetiche por pés:",["Curto","Tenho curiosidade","Não curto"],1),
+    Q("Duração ideal:",["Rápido e intenso","Longo e demorado","Varia com o clima"],1),
+    Q("Quantas vezes por semana você gostaria de transar?",["1 a 2","3 a 4","Todo dia"],1),
+    Q("Luz na hora:",["Acesa","Penumbra","Escuro"],1),
+    Q("Depois do sexo você prefere:",["Carinho e conversa","Banho e dormir","Mais uma rodada"],1),
+    Q("Relação aberta ou swing:",["Topo","Talvez","Não topo"],1),
+    Q("Ciúmes:",["Sou ciumento(a)","Moderado","Nada ciumento(a)"],1),
+    Q("Qual fantasia mais te atrai?",["Dominar alguém","Ser dominado(a)","Ser surpreendido(a)"],1),
+    Q("Experiência nova ou conhecida?",["Novidades","O que já conheço","Equilíbrio"],1),
+    Q("O que mais te desliga?",["Falta de higiene","Pressa","Falta de química"],1),
+    Q("Limites absolutos:",["Tenho vários","Poucos","Nenhum"],1),
+    // ----- Hábitos e experiências -----
+    Q("Aplicativos de encontros sexuais:",["Uso","De vez em quando","Nunca usei"],1),
+    Q("Já marcou encontros sexuais?",["Sim","De vez em quando","Nunca"],1),
+    Q("Apaga as mensagens íntimas do celular?",["Sim","De vez em quando","Nunca"]),
+    Q("Curte receber carinho na região íntima, estando vestido(a)?",["Sim","Não","Depende do lugar"]),
+    Q("Você guarda segredos com facilidade?",["Sim","Não","Prefiro não dizer"]),
+    Q("Trairia alguma vez?",["Sim","Não","Sempre"],1),
+    Q("Ficaria com amigos(as)?",SNT,1),
+    Q("Iniciativa na hora H:",["Eu tomo a iniciativa","Prefiro ser convidado(a)","Tanto faz"],1),
+    Q("Tomar a iniciativa por mensagem:",["Faço sempre","Quase nunca","Às vezes"]),
+    Q("Banho a dois:",["Super topo","Prefiro sozinho(a)","Tanto faz"],1),
+    Q("Fotos sensuais:",["Curto mandar/receber","Não mando/evito","Sempre envio"],1),
+    Q("Fotos sensuais entre o casal:",["Mando/recebo","Evito total","Nunca fiz"],1),
+    Q("Já enviou fotos íntimas por engano?",["Já enviei sem querer","Nunca aconteceu","Deu tempo de apagar"]),
+    Q("Já recebeu fotos íntimas por engano?",["Já recebi","Nunca aconteceu","Deu tempo de apagarem"]),
+    Q("Que tipo de fotos já recebeu?",["Cuzinho","Vagina","Peitinhos"]),
+    Q("Que tipo de fotos já enviou?",["Pênis","Peitoral","Pernas"]),
+    Q("Como gosta de tirar fotos?",["Excitado(a) em pé","No banheiro, excitado(a)","Excitado(a), deitado(a) na cama"]),
+    Q("Fantasia a dois:",FANT,1),
+    Q("Fantasia a três:",FANT,1),
+    Q("Transa a três sendo dois homens e uma mulher:",TOPO),
+    Q("Transa a três sendo duas mulheres e um homem:",TOPO),
+    Q("Transa a três com amigos e amigas?",TOPO),
+    Q("Transa a três com amigas?",TOPO),
+    Q("Toparia ser chupado(a) por amigos(as)?",TOPO,1),
+    Q("Toparia ser masturbado(a) por amigos(as)?",TOPO),
+    Q("Acorda excitado(a)?",SNS),
+    Q("Já gozou dormindo?",SNS),
+    Q("Sexo matinal te agrada?",["Amo começar o dia assim","Prefiro à noite","Tanto faz"],1),
+    Q("Assistir pornô juntos pra esquentar:",["Não curto","Prefiro conversar","Tenho curiosidade"],1),
+    Q("Câmera ligada, filmando:",["Nunca fiz","Prefiro não","Toparia"],1),
+    Q("Explorar brinquedos no parceiro(a):",["Curioso(a) e aberto(a)","Prefiro não usar","Indiferente"]),
+    Q("Brinquedos a dois:",["Topo testar","Prefiro sem","Depende"],1),
+    Q("Vibrador controlado por app:",["Topo testar","Talvez, em casa","Prefiro não"],1),
+    Q("Você se sente desconfortável em ficar pelado(a) na frente de amigos de confiança?",["Ficaria","Tenho muita vergonha","Depende"]),
+    Q("Você se considera numa relação:",["100% ativo(a) dominador(a)","Versátil","Passivo(a)"],1),
+    Q("Você aceitaria alguém:",["100% ativo(a)","Passivo(a)","Outra"]),
+    Q("Já teve experiências bi?",SNT,1),
+    Q("Já saiu com gay ou bi, ou sairia?",SNT,1),
+    Q("Já saiu com trans, ou sairia?",SNT),
+    Q("Já saiu com pessoa casada?",SNT),
+    Q("Qual parte do corpo te dá mais prazer?",["Região íntima","Barriga","Pernas"]),
+    Q("Posição favorita:",["4","Frango assado","Qualquer uma"],1),
+    Q("Explorar novas posições:",["Curto testar","Fico nas clássicas","Talvez"],1),
+    Q("Prefere o quê?",["Realizar","Assistir","Outra"]),
+    Q("Você se masturba?",["Sim","Não","Não gosta"],1),
+    Q("Aceitaria se masturbar?",["Sim","Não","Depende"]),
+    Q("Se pudesse escolher uma fantasia para realizar, qual seria?",["Penetração anal em outra pessoa","Receber sexo oral de outra pessoa","Outra"]),
+    Q("Já realizou penetração anal em outra pessoa alguma vez na vida?",SNG),
+    Q("Já recebeu sexo oral no seu órgão genital?",SNG),
+    Q("Já pensou em introduzir algo maior na hora do sexo?",["Tenho muita vergonha, melhor não","Estou pensando em começar a usar","Prefiro outro tipo de fetiche"]),
+    Q("Gosta de assistir xvideos?",["Sim","Nunca","Gostaria"]),
+    Q("Já recebeu uma mão amiga?",["Sim","Nunca","Gostaria"]),
+    Q("Já gozou na boca de alguém?",["Sim","Nunca","Gostaria"]),
+    Q("Onde tem o fetiche de gozar?",["Na boca","No cuzinho","Ambos"]),
+    Q("Você curte uma mijada na hora do sexo?",["Nem pensar","Adoraria essa experiência","Prefiro outro tipo de fetiche"]),
+    Q("Preferência em usar preservativo:",["Sempre","Conforme combinado","Não gosto de usar"],1),
+    Q("Privacidade de registros (foto/vídeo):",["Sem registros","Fotos sem rosto","Ok com regras claras"],1),
+    Q("Destino de registros (se houver):",["Apagar depois","Guardar com permissão","Não tiro/recebo"]),
+    Q("Check-ins de consentimento durante:",["Gosto que pergunte","Sinais sutis bastam","Só aviso se algo incomodar"],1),
+    Q("Discrição com terceiros:",["Precisa ser discreto","Normal","Moro só/sem restrições"]),
+    Q("Local para o encontro íntimo:",["Hotel/Airbnb","Minha casa","Sua casa"],1),
+    Q("Exclusividade/combinação sexual:",["Exclusivo entre nós","Aberto com regras","Sem rótulos (conversamos)"],1),
+    Q("Orgasmo: prefere como?",["Juntos, se der","Sozinho(a)","Cada um no seu tempo"],1),
+    Q("Fetiches?",["Dominar","Ser dominado(a)","Apenas observar"],1),
+    Q("Já foi chupado(a)?",SNG,1),
+    Q("Já gozou na boca de outra pessoa?",SNS),
+    Q("Já gozou no cuzinho de outra pessoa?",SNS),
+    Q("Sairia com amigos(as) de confiança?",SNT),
+    Q("Você goza muito?",SNS),
+    Q("Gosta de ver outros transando?",["Sim","Não","Depende de quem/como"],1),
+    Q("Gostaria de ser visto(a) por amigos(as) transando com alguém?",["Sim","Não","Toparia"]),
+    Q("Gosta de compartilhar vídeos +18 com amigos(as)?",["Sim","Não","Evito"],1),
+    Q("Tipos de vídeos que gosta:",["Caseiro","Amador","Estúdio"]),
+    Q("Mensagens antes (conteúdo explícito):",["Evito conteúdo explícito","Ok com limites","Só depois de alinhar"])
+  ]
+};
+// ==========================================================
+
+(()=>{
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let lista=[], total=0, resp=[], modo='';
+const user={apelido:'',genero:'',idade:null,altura:null,peso:null};
+let i=0, timer=null, sent=false;
+
+const screens={age:$('s-age'),mode:$('s-mode'),intro:$('s-intro'),quiz:$('s-quiz'),result:$('s-result')};
+const labels={age:'Maiores de 18',mode:'Modo do quiz',intro:'Seus dados',result:'Concluído'};
+const order=['age','mode','intro','quiz','result'];
+let reached=0;
+
+// contagens exibidas nos cartões de modo
+const nComp=CFG.perguntas.filter(q=>q.c).length, nFull=CFG.perguntas.length;
+$('nCompacto').textContent=`${nComp}+ perguntas`; $('nCompleto').textContent=`${nFull}+ perguntas`;
+
+document.title=CFG.titulo; $('brand').textContent=CFG.titulo;
+if(!CFG.usarWhatsApp) $('btnWhats').hidden=true;
+$('maxMB').textContent=CFG.maxArquivoMB;
+if(!CFG.permitirArquivo) $('uploadBox').hidden=true;
+
+function go(n){
+  for(const k in screens) screens[k].hidden=(k!==n);
+  document.body.dataset.stage=n;
+  if(labels[n]) $('stepLabel').textContent=labels[n];
+  $('progress').style.width=(n==='result'?100:0)+'%';
+  reached=Math.max(reached,order.indexOf(n));
+  document.querySelectorAll('#menu button').forEach(b=>{
+    const idx=order.indexOf(b.dataset.go), cur=b.dataset.go===n;
+    b.classList.toggle('cur',cur);
+    b.classList.toggle('done',!cur&&idx<=reached&&n!=='result'&&b.dataset.go!=='result');
+    if(cur) b.setAttribute('aria-current','step'); else b.removeAttribute('aria-current');
+  });
+  window.scrollTo({top:0,behavior:'auto'});
+}
+$('menu').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b||!b.classList.contains('done')) return;
+  const n=b.dataset.go;
+  if(n==='quiz'){ go('quiz'); render(); } else go(n);
+});
+
+// ---------- Chips ----------
+function chips(wrap,list,onPick){
+  list.forEach(t=>{
+    const b=document.createElement('button');
+    b.type='button'; b.className='chip'; b.setAttribute('role','radio'); b.setAttribute('aria-checked','false'); b.textContent=t;
+    b.onclick=()=>{[...wrap.children].forEach(c=>c.setAttribute('aria-checked','false')); b.setAttribute('aria-checked','true'); onPick(t);};
+    wrap.appendChild(b);
+  });
+}
+let genero=null;
+chips($('generoChips'),CFG.generos,t=>{genero=t;$('errGenero').hidden=true;});
+
+// ---------- Fluxo inicial ----------
+$('btnAgeExit').onclick=()=>{location.href='about:blank';};
+$('btnAgeOk').onclick=()=>go('mode');
+$('btnModeBack').onclick=()=>go('age');
+$('btnIntroBack').onclick=()=>go('mode');
+document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>{ modo=b.dataset.modo; go('intro'); $('apelido').focus({preventScroll:true}); });
+
+function validar(){
+  const idade=parseInt($('idade').value,10), altura=parseInt($('altura').value,10), peso=parseFloat($('peso').value);
+  const bad={
+    errGenero:!genero,
+    errIdade:!(idade>=18&&idade<=120),
+    errAltura:!(altura>=50&&altura<=250),
+    errPeso:!(peso>=20&&peso<=400)
+  };
+  let first=null;
+  for(const k in bad){ $(k).hidden=!bad[k]; if(bad[k]&&!first) first=k; }
+  if(first){ $(first).scrollIntoView({block:'center',behavior:'smooth'}); return false; }
+  Object.assign(user,{apelido:$('apelido').value.trim(),genero,idade,altura,peso});
+  return true;
+}
+function start(){
+  if(!validar()) return;
+  // dote (conforme o gênero) vem primeiro; depois as perguntas do modo escolhido
+  lista=[...(CFG.dote[user.genero]||[]), ...CFG.perguntas.filter(q=>modo==='completo'||q.c)];
+  total=lista.length; resp=new Array(total).fill(null); i=0;
+  go('quiz'); render();
+}
+$('btnStart').onclick=start;
+screens.intro.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.tagName==='INPUT') start(); });
+
+// ---------- Perguntas ----------
+function render(){
+  const p=lista[i];
+  $('question').textContent=p.texto;
+  const box=$('options'); box.innerHTML='';
+  p.opcoes.forEach((lab,k)=>{
+    const b=document.createElement('button');
+    b.type='button'; b.className='option'+(resp[i]===k?' sel':''); b.setAttribute('role','radio'); b.setAttribute('aria-checked',resp[i]===k);
+    b.innerHTML=`<span class="k">${k+1}</span><span>${esc(lab)}</span>`;
+    b.onclick=()=>pick(k);
+    box.appendChild(b);
+  });
+  $('stepLabel').textContent=`Pergunta ${i+1} de ${total}`;
+  $('progress').style.width=(i/total*100)+'%';
+  $('btnNext').textContent=(i===total-1)?'Concluir':'Avançar';
+  $('btnNext').disabled=(resp[i]===null);
+  $('btnBack').disabled=(i===0);
+}
+function pick(k){
+  clearTimeout(timer);
+  resp[i]=k; render();
+  timer=setTimeout(next,280);     // avança sozinho
+}
+function next(){
+  clearTimeout(timer);
+  if(i<total-1){
+    i++; render(); $('question').focus({preventScroll:true});
+    if(i%CFG.fotos.trocarACada===0) photo.next();
+  } else finish();
+}
+function back(){ clearTimeout(timer); if(i>0){ i--; render(); } }
+$('btnNext').onclick=next;
+$('btnBack').onclick=back;
+$('btnSkip').onclick=next;
+
+document.addEventListener('keydown',e=>{
+  const focus=document.body.classList.contains('focus');
+  if(focus){
+    if(e.key==='Escape') setFocus(false);
+    else if(e.key==='ArrowRight') photo.next();
+    else if(e.key==='ArrowLeft') photo.prev();
+    return;
+  }
+  if(screens.quiz.hidden||/INPUT|TEXTAREA/.test(e.target.tagName)) return;
+  if(/^[1-9]$/.test(e.key)){ const n=+e.key-1; if(n<lista[i].opcoes.length) pick(n); }
+  else if(e.key==='ArrowLeft') back();
+  else if(e.key==='ArrowRight'&&resp[i]!==null) next();
+});
+
+// ---------- Resultado ----------
+function calcPercents(){
+  const c=[0,0,0]; resp.forEach(v=>{ if(v!==null&&v<3) c[v]++; });
+  const r=c.map(n=>Math.random()*(n+1.5));
+  const s=r.reduce((a,b)=>a+b,0)||1;
+  const a=Math.floor(r[0]/s*100), b=Math.floor(r[1]/s*100);
+  return [a,b,100-a-b];
+}
+function estimativa(){
+  let soma=0, pesos=0;
+  CFG.indicador.forEach(x=>{
+    if(x.g&&x.g!==user.genero) return;
+    const n=lista.findIndex(q=>q.texto===x.q);
+    if(n<0||resp[n]===null) return;
+    soma+=(x.v[resp[n]]??0)*x.peso; pesos+=x.peso;
+  });
+  return pesos? Math.round(soma/pesos*100) : '';   // vazio = sem dados suficientes
+}
+function payload(){
+  const p={
+    'Timestamp':new Date().toISOString(),
+    'Título do Quiz':CFG.titulo,
+    'Apelido':user.apelido,
+    'Idade':user.idade,
+    'Modo':modo,
+    'Estimativa mesmo gênero (%)':estimativa(),
+    'Gênero':user.genero,
+    'Altura (cm)':user.altura,
+    'Peso (kg)':user.peso
+  };
+  lista.forEach((q,n)=>{
+    p[`Q ${String(n+1).padStart(2,'0')} - ${q.texto}`]=resp[n]!==null?q.opcoes[resp[n]]:'';
+  });
+  return p;
+}
+function finish(){
+  go('result');
+  $('resTitle').textContent=user.apelido?`Pronto, ${user.apelido}!`:'Pronto!';
+  $('finalMessage').textContent=CFG.finalMessage||'';
+
+  const pcts=calcPercents();
+  $('pct').innerHTML=CFG.percentLabels.map((l,n)=>
+    `<div><div class="row"><span>${esc(l)}</span><span>${pcts[n]}%</span></div><div class="track"><i data-w="${pcts[n]}"></i></div></div>`).join('');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll('#pct i').forEach(el=>el.style.width=el.dataset.w+'%')));
+
+  $('userData').innerHTML=[['Modo',modo==='completo'?'Completo':'Compacto'],['Idade',user.idade],['Gênero',user.genero],['Altura',user.altura+' cm'],['Peso',user.peso+' kg']]
+    .map(([k,v])=>`<dt>${k}</dt><dd>${esc(v)}</dd>`).join('');
+  $('answers').innerHTML=lista.map((q,n)=>
+    `<li>${esc(q.texto)}<br><em>${resp[n]!==null?esc(q.opcoes[resp[n]]):'(sem resposta)'}</em></li>`).join('');
+
+  if(!sent) enviarRespostas();
+}
+
+// ---------- Envio (planilha + e-mail via Apps Script) ----------
+const setStatus=(el,msg,cls='')=>{el.textContent=msg; el.className='status '+cls;};
+async function post(obj){
+  await fetch(CFG.sheetWebAppURL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(obj)});
+}
+async function enviarRespostas(){
+  const st=$('sendStatus'); $('btnRetry').hidden=true;
+  if(!CFG.sheetWebAppURL){ setStatus(st,'Envio não configurado.','err'); return; }
+  setStatus(st,'Enviando suas respostas…');
+  try{ await post(payload()); sent=true; setStatus(st,'Respostas enviadas. Obrigado!','ok'); }
+  catch(e){ setStatus(st,'Não foi possível enviar. Confira a conexão e tente de novo.','err'); $('btnRetry').hidden=false; }
+}
+$('btnRetry').onclick=enviarRespostas;
+
+// ---------- Arquivo opcional ----------
+const fileInput=$('fileInput');
+$('btnPick').onclick=()=>fileInput.click();
+fileInput.onchange=()=>{
+  const f=fileInput.files[0], up=$('uploadStatus');
+  setStatus(up,''); $('btnUpload').disabled=true; $('fileName').textContent='';
+  if(!f) return;
+  if(f.size>CFG.maxArquivoMB*1024*1024){ setStatus(up,`Arquivo grande demais. O máximo é ${CFG.maxArquivoMB} MB.`,'err'); fileInput.value=''; return; }
+  $('fileName').textContent=f.name; $('btnUpload').disabled=false;
+};
+$('btnUpload').onclick=async()=>{
+  const f=fileInput.files[0], up=$('uploadStatus'); if(!f) return;
+  $('btnUpload').disabled=true; setStatus(up,'Enviando arquivo…');
+  try{
+    const base64=await new Promise((res,rej)=>{const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]); r.onerror=()=>rej(r.error); r.readAsDataURL(f);});
+    await post({tipo:'arquivo','Apelido':user.apelido,nome:f.name,mime:f.type||'application/octet-stream',base64});
+    setStatus(up,'Arquivo enviado.','ok'); fileInput.value=''; $('fileName').textContent='';
+  }catch(e){ setStatus(up,'Não foi possível enviar o arquivo. Tente de novo.','err'); $('btnUpload').disabled=false; }
+};
+
+// ---------- WhatsApp / reiniciar ----------
+$('btnWhats').onclick=()=>{
+  const L=[CFG.firstMessage||'Olá!',`*${CFG.titulo}*`,'','*Dados iniciais*',
+    `Idade: ${user.idade}`,`Gênero: ${user.genero}`,`Altura: ${user.altura} cm`,`Peso: ${user.peso} kg`,'','*Respostas*'];
+  lista.forEach((q,n)=>L.push(`${q.texto.replace(/\s+/g,' ').trim()} *${resp[n]!==null?q.opcoes[resp[n]]:'(sem resposta)'}*`));
+  const num=(CFG.whatsappNumber||'').replace(/\D/g,'');
+  window.open(`https://api.whatsapp.com/send?${num?'phone='+num+'&':''}text=${encodeURIComponent(L.join('\n'))}`,'_blank');
+};
+$('btnRestart').onclick=()=>location.reload();
+
+// ==========================================================
+// Fotos de fundo + modo "Ver foto"
+// ==========================================================
+const photo=(()=>{
+  const F=CFG.fotos, layers=[...document.querySelectorAll('#bg .layer')];
+  const pad=n=>String(n).padStart(3,'0');
+  const hist=[]; const used=new Set(); let pos=-1, front=1, busy=false;
+
+  const exists=u=>new Promise(r=>{const m=new Image(); m.onload=()=>r(true); m.onerror=()=>r(false); m.src=u;});
+  async function firstOf(urls){ for(const u of urls) if(await exists(u)) return u; return null; }
+  async function random(){
+    for(let t=0;t<14;t++){
+      const n=1+Math.floor(Math.random()*F.total);
+      if(used.has(n)&&used.size<F.total) continue;
+      used.add(n);
+      const u=await firstOf(F.exts.map(e=>`${F.pasta}/bg${pad(n)}.${e}`));
+      if(u) return u;
+    }
+    return null;
+  }
+  function show(u){
+    const nx=layers[1-front]; nx.style.backgroundImage=`url("${u}")`;
+    nx.classList.add('on'); layers[front].classList.remove('on'); front=1-front;
+  }
+  async function next(){
+    if(busy) return; busy=true;
+    try{
+      if(pos<hist.length-1){ pos++; show(hist[pos]); }
+      else{ const u=await random(); if(u){ hist.push(u); pos=hist.length-1; show(u); } }
+    } finally{ busy=false; }
+  }
+  function prev(){ if(pos>0){ pos--; show(hist[pos]); } }
+  async function init(){
+    let u=await firstOf(F.capa.map(f=>`${F.pasta}/${f}`));
+    if(!u) u=await random();
+    if(u){ hist.push(u); pos=0; show(u); $('btnFoto').hidden=false; }
+  }
+  return {init,next,prev};
+})();
+
+function setFocus(on){
+  document.body.classList.toggle('focus',on);
+  $('focusBar').hidden=!on;
+  $('btnFoto').setAttribute('aria-pressed',on);
+  if(!on) window.scrollTo({top:0});
+}
+$('btnFoto').onclick=e=>{e.stopPropagation(); setFocus(true);};
+$('fbBack').onclick=e=>{e.stopPropagation(); setFocus(false);};
+$('fbNext').onclick=e=>{e.stopPropagation(); photo.next();};
+$('fbPrev').onclick=e=>{e.stopPropagation(); photo.prev();};
+document.body.addEventListener('click',e=>{
+  if(document.body.classList.contains('focus')&&!e.target.closest('#focusBar')) photo.next(); // toque na foto = próxima
+});
+
+photo.init();
+go('age');
+})();
+</script>
+</body>
+</html>
