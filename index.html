@@ -29,6 +29,9 @@ body{touch-action:manipulation;margin:0;min-height:100dvh;background:var(--ink);
 #bg .layer.on{opacity:1}
 #shade{position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,rgba(8,6,12,.55),rgba(8,6,12,.84));transition:opacity .5s ease}
 body.focus #shade{opacity:.08}
+/* modo foto: troca instantânea; a imagem inteira, com as laterais encostando na tela e bordas só em cima/embaixo */
+body.focus #bg{background:#000}
+body.focus #bg .layer{background-size:contain;background-position:center;transition:none}
 
 /* ---------- Topo ---------- */
 .top{position:fixed;top:0;left:0;right:0;z-index:5;padding-top:env(safe-area-inset-top);background:rgba(12,11,16,.72);
@@ -797,10 +800,20 @@ $('btnRestart').onclick=()=>location.reload();
 const photo=(()=>{
   const F=CFG.fotos, layers=[...document.querySelectorAll('#bg .layer')];
   const pad=n=>String(n).padStart(3,'0');
-  const hist=[]; const used=new Set(); let pos=-1, front=1, busy=false;
+  const hist=[], used=new Set(), queue=[], cache=new Map(), imgs=[];
+  const waiters=[]; let pos=-1, front=1, inflight=0;
 
-  const exists=u=>new Promise(r=>{const m=new Image(); m.onload=()=>r(true); m.onerror=()=>r(false); m.src=u;});
-  async function firstOf(urls){ for(const u of urls) if(await exists(u)) return u; return null; }
+  // carrega e decodifica a imagem com antecedência (resolve true/false)
+  function ready(u){
+    if(!cache.has(u)) cache.set(u,new Promise(r=>{
+      const m=new Image(); imgs.push(m);
+      m.onload=()=>{ (m.decode?m.decode():Promise.resolve()).catch(()=>{}).then(()=>r(true)); };
+      m.onerror=()=>r(false);
+      m.src=u;
+    }));
+    return cache.get(u);
+  }
+  async function firstOf(urls){ for(const u of urls) if(await ready(u)) return u; return null; }
   async function random(){
     if(F.lista&&F.lista.length){
       for(let t=0;t<14;t++){
@@ -808,7 +821,7 @@ const photo=(()=>{
         if(used.has(n)&&used.size<F.lista.length) continue;
         used.add(n);
         const u=`${F.pasta}/${F.lista[n]}`;
-        if(await exists(u)) return u;
+        if(await ready(u)) return u;
       }
       return null;
     }
@@ -821,22 +834,34 @@ const photo=(()=>{
     }
     return null;
   }
+  // mantém as próximas fotos carregadas em paralelo, para a troca ser instantânea
+  const AHEAD=5;
+  function deliver(u){ if(waiters.length) waiters.shift()(u); else queue.push(u); }
+  function fill(){
+    const need=AHEAD-queue.length-inflight;
+    for(let k=0;k<need;k++){
+      inflight++;
+      random().then(u=>{ if(u) deliver(u); }).finally(()=>{
+        inflight--;
+        if(!inflight) while(waiters.length) waiters.shift()(null);   // acabaram as fotos
+      });
+    }
+  }
   function show(u){
     const nx=layers[1-front]; nx.style.backgroundImage=`url("${u}")`;
     nx.classList.add('on'); layers[front].classList.remove('on'); front=1-front;
   }
   async function next(){
-    if(busy) return; busy=true;
-    try{
-      if(pos<hist.length-1){ pos++; show(hist[pos]); }
-      else{ const u=await random(); if(u){ hist.push(u); pos=hist.length-1; show(u); } }
-    } finally{ busy=false; }
+    if(pos<hist.length-1){ pos++; show(hist[pos]); return; }      // já vista: instantâneo
+    const u=queue.length ? queue.shift() : await new Promise(res=>{ waiters.push(res); fill(); });
+    if(!u) return;
+    hist.push(u); pos=hist.length-1; show(u); fill();
   }
   function prev(){ if(pos>0){ pos--; show(hist[pos]); } }
   async function init(){
     let u=await firstOf(F.capa.map(f=>`${F.pasta}/${f}`));
     if(!u) u=await random();
-    if(u){ hist.push(u); pos=0; show(u); $('btnFoto').hidden=false; }
+    if(u){ hist.push(u); pos=0; show(u); $('btnFoto').hidden=false; fill(); }
   }
   return {init,next,prev};
 })();
