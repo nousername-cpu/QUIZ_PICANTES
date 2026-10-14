@@ -20,7 +20,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;min-height:100dvh;background:var(--ink);color:var(--paper);font:400 16px/1.5 var(--sans);
+body{touch-action:manipulation;margin:0;min-height:100dvh;background:var(--ink);color:var(--paper);font:400 16px/1.5 var(--sans);
   padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 
 /* ---------- Fundo ---------- */
@@ -29,7 +29,6 @@ body{margin:0;min-height:100dvh;background:var(--ink);color:var(--paper);font:40
 #bg .layer.on{opacity:1}
 #shade{position:fixed;inset:0;z-index:-2;background:linear-gradient(180deg,rgba(8,6,12,.55),rgba(8,6,12,.84));transition:opacity .5s ease}
 body.focus #shade{opacity:.08}
-body.focus{cursor:pointer}
 
 /* ---------- Topo ---------- */
 .top{position:fixed;top:0;left:0;right:0;z-index:5;padding-top:env(safe-area-inset-top);background:rgba(12,11,16,.72);
@@ -46,10 +45,9 @@ body.focus{cursor:pointer}
 @media(max-width:640px){
   .top .in{flex-wrap:wrap;gap:0;padding-bottom:4px}
   .brand{padding:16px 0 6px}
-  #btnFoto{margin-left:auto}
   .menu{order:3;width:100%;margin:0}
 }
-body.focus .top,body.focus .card,body.focus .foot{opacity:0;visibility:hidden;pointer-events:none}
+body.focus .top,body.focus .card{opacity:0;visibility:hidden;pointer-events:none}
 
 /* ---------- Layout ---------- */
 .stage{min-height:100dvh;display:grid;place-items:center;padding:130px clamp(12px,4vw,24px) 60px}
@@ -57,7 +55,6 @@ body.focus .top,body.focus .card,body.focus .foot{opacity:0;visibility:hidden;po
 .card{width:min(660px,100%);background:var(--glass);border:1px solid var(--line);border-radius:18px;
   padding:clamp(20px,4vw,34px);backdrop-filter:blur(16px) saturate(120%);-webkit-backdrop-filter:blur(16px) saturate(120%);
   box-shadow:0 28px 70px rgba(0,0,0,.5);transition:opacity .35s ease,visibility .35s}
-.foot{position:fixed;bottom:calc(10px + env(safe-area-inset-bottom));left:0;right:0;text-align:center;font-size:.78rem;color:var(--muted);transition:opacity .35s}
 
 .meta{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;font-size:.85rem;color:var(--muted)}
 .bar{height:4px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin-bottom:26px}
@@ -143,8 +140,45 @@ details li em{color:var(--muted);font-style:normal}
 .fname{font-size:.88rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 
 /* ---------- Modo foto ---------- */
-#focusBar{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:6;display:flex;gap:8px;padding:8px;
-  background:var(--glass);border:1px solid var(--line);border-radius:99px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);cursor:default}
+/* botão central inferior: "Ver foto" / "Voltar para o quiz" */
+#fotoDock{position:fixed;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom));z-index:7;display:flex;justify-content:center;pointer-events:none}
+#fotoDock .btn{pointer-events:auto;border-radius:99px;padding:14px 26px;background:rgba(16,13,20,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(0,0,0,.45)}
+body.focus #fotoDock .btn{background:var(--accent);border-color:var(--accent);color:#fff}
+body.focus #fotoDock .btn:hover{background:var(--accent-hi)}
+/* setas sobre a imagem */
+.arrow{position:fixed;top:50%;transform:translateY(-50%);z-index:6;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  color:#fff;background:rgba(12,11,16,.5);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:background .2s,transform .1s}
+.arrow:hover{background:rgba(12,11,16,.75)}
+.arrow:active{transform:translateY(-50%) scale(.95)}
+.arrow.l{left:calc(clamp(10px,3vw,28px) + env(safe-area-inset-left))}
+.arrow.r{right:calc(clamp(10px,3vw,28px) + env(safe-area-inset-right))}
+.arrow svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- Lista suspensa própria ---------- */
+.select{appearance:none;width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;font:500 1rem var(--sans);color:var(--paper);
+  background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:13px 14px;min-height:48px;cursor:pointer;transition:border-color .2s,background .2s}
+.select:hover{background:rgba(255,255,255,.11)}
+.select[aria-expanded="true"]{border-color:var(--accent-hi)}
+.select .ph{color:rgba(255,255,255,.38)}
+.select svg{flex:none;width:16px;height:16px;fill:none;stroke:var(--muted);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+.select[aria-expanded="true"] svg{transform:rotate(180deg)}
+#sheet{position:fixed;inset:0;z-index:30}
+#sheet .back{position:absolute;inset:0}
+#sheet .panel{position:fixed;display:flex;flex-direction:column;background:rgba(22,18,28,.97);border:1px solid var(--line);border-radius:14px;
+  box-shadow:0 24px 60px rgba(0,0,0,.6);overflow:hidden}
+#sheet .ttl{padding:12px 16px 8px;font:700 .8rem var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:none}
+#sheet ul{list-style:none;margin:0;padding:6px;overflow-y:auto;overscroll-behavior:contain;max-height:inherit}
+#sheet li button{appearance:none;width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;font:600 1rem var(--sans);color:var(--paper);
+  background:none;border:0;border-radius:9px;padding:12px 14px;min-height:44px;cursor:pointer}
+#sheet li button:hover,#sheet li button:focus-visible{background:rgba(255,255,255,.1);outline:none}
+#sheet li button[aria-selected="true"]{background:rgba(214,60,102,.25)}
+#sheet li button[aria-selected="true"]::after{content:"✓";color:var(--accent-hi)}
+@media(max-width:640px){
+  #sheet .back{background:rgba(0,0,0,.55)}
+  #sheet .panel{left:0!important;right:0;top:auto!important;bottom:0;width:auto!important;max-height:62dvh!important;border-radius:20px 20px 0 0;padding-bottom:env(safe-area-inset-bottom)}
+  #sheet .ttl{display:block}
+  #sheet li button{min-height:50px}
+}
 
 @media(max-width:480px){
   .nav{flex-wrap:wrap}
@@ -168,7 +202,6 @@ details li em{color:var(--muted);font-style:normal}
       <button type="button" data-go="quiz">Perguntas</button>
       <button type="button" data-go="result">Resultado</button>
     </nav>
-    <button id="btnFoto" class="btn sm" type="button" aria-pressed="false" hidden>Ver foto</button>
   </div>
 </header>
 
@@ -220,18 +253,18 @@ details li em{color:var(--muted);font-style:normal}
       <div class="form3" style="margin-top:14px">
         <div class="field">
           <label for="idade">Idade</label>
-          <input id="idade" class="input" type="number" min="18" max="120" inputmode="numeric" placeholder="28">
-          <div id="errIdade" class="err" hidden>18 ou mais.</div>
+          <button id="idade" class="select" type="button" aria-haspopup="listbox" aria-expanded="false" data-ph="Selecione" data-title="Idade"><span class="ph">Selecione</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg></button>
+          <div id="errIdade" class="err" hidden>Selecione a idade.</div>
         </div>
         <div class="field">
           <label for="altura">Altura (cm)</label>
-          <input id="altura" class="input" type="number" min="50" max="250" inputmode="numeric" placeholder="172">
-          <div id="errAltura" class="err" hidden>Informe em cm.</div>
+          <button id="altura" class="select" type="button" aria-haspopup="listbox" aria-expanded="false" data-ph="Selecione" data-title="Altura"><span class="ph">Selecione</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg></button>
+          <div id="errAltura" class="err" hidden>Selecione a altura.</div>
         </div>
         <div class="field">
           <label for="peso">Peso (kg)</label>
-          <input id="peso" class="input" type="number" min="20" max="400" inputmode="decimal" placeholder="70">
-          <div id="errPeso" class="err" hidden>Peso inválido.</div>
+          <button id="peso" class="select" type="button" aria-haspopup="listbox" aria-expanded="false" data-ph="Selecione" data-title="Peso"><span class="ph">Selecione</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg></button>
+          <div id="errPeso" class="err" hidden>Selecione o peso.</div>
         </div>
       </div>
       <div class="nav">
@@ -244,6 +277,7 @@ details li em{color:var(--muted);font-style:normal}
     <div id="s-quiz" hidden>
       <h2 id="question" tabindex="-1"></h2>
       <div id="options" class="options" role="radiogroup" aria-labelledby="question"></div>
+      <p class="small" id="hint" style="margin:14px 0 0">Clique ou use Espaço para marcar. Duplo clique ou Enter para avançar.</p>
       <div class="nav">
         <button id="btnBack" class="btn" type="button">Voltar</button>
         <div class="right">
@@ -286,15 +320,17 @@ details li em{color:var(--muted);font-style:normal}
         <button id="btnWhats" class="btn primary" type="button">Abrir WhatsApp</button>
       </div>
     </div>
+    <p class="small" style="margin:22px 0 0;text-align:center">Conteúdo +18 · Uso recreativo</p>
   </section>
 </main>
 
-<div class="foot">Conteúdo +18 · Uso recreativo</div>
+<div id="fotoDock"><button id="btnFoto" class="btn" type="button" aria-pressed="false" hidden>Ver foto</button></div>
+<button id="arrPrev" class="arrow l" type="button" aria-label="Foto anterior" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+<button id="arrNext" class="arrow r" type="button" aria-label="Próxima foto" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
 
-<div id="focusBar" hidden>
-  <button id="fbPrev" class="btn sm" type="button" aria-label="Foto anterior">‹ Anterior</button>
-  <button id="fbBack" class="btn sm primary" type="button">Voltar ao quiz</button>
-  <button id="fbNext" class="btn sm" type="button" aria-label="Próxima foto">Próxima ›</button>
+<div id="sheet" hidden>
+  <div class="back"></div>
+  <div class="panel" role="presentation"><div class="ttl" id="sheetTtl"></div><ul id="sheetList" role="listbox"></ul></div>
 </div>
 
 <script>
@@ -313,13 +349,16 @@ const CFG={
   // Envio para planilha + e-mail (o e-mail fica configurado no Google Apps Script, veja Code.gs)
   sheetWebAppURL:"https://script.google.com/macros/s/AKfycbxJ2j4PJyHmUWC4rcefgCjEVMvAhpEvMo3VOoLsYcHOJQ2L7bS_CLDE70E1Gixr5KQ/exec",
   maxArquivoMB:8,
+  avancarAoMarcar:false,   // false = clique/Espaço só marca; duplo clique ou Enter avança. true = avança sozinho ao marcar
 
   usarWhatsApp:true,
   whatsappNumber:"",            // só dígitos com DDI; vazio = a pessoa escolhe o contato
   firstMessage:"Oi! Quero participar do quiz. Pode me atender?",
 
-  // Fotos de fundo: home.jpg (capa) + bg001, bg002... na mesma pasta do index.html
-  fotos:{ pasta:".", total:240, exts:["webp","jpg","jpeg","png"],
+  // Fotos de fundo. Duas formas (use uma):
+  //  1) lista: escreva os nomes dos arquivos, quaisquer que sejam, ex.: ["praia.jpg","foto2.png","IMG_0412.webp"]
+  //  2) deixe lista vazia [] e use home.jpg (capa) + bg001, bg002... até "total", na mesma pasta do index.html
+  fotos:{ lista:[], pasta:".", total:240, exts:["webp","jpg","jpeg","png"],
           capa:["home.webp","home.jpg","home.jpeg","home.png"], trocarACada:1 },
 
   // false = esconde o envio de arquivo no site (o código continua aqui e no Code.gs; mude para true para reativar)
@@ -516,6 +555,51 @@ function chips(wrap,list,onPick){
 let genero=null;
 chips($('generoChips'),CFG.generos,t=>{genero=t;$('errGenero').hidden=true;});
 
+// ---------- Lista suspensa própria (sem o seletor do sistema) ----------
+CFG.selects={
+  idade :{vals:Array.from({length:82},(_,k)=>k+18),   fmt:v=>`${v} anos`},
+  altura:{vals:Array.from({length:91},(_,k)=>k+140),  fmt:v=>`${v} cm`, inicio:170},
+  peso  :{vals:Array.from({length:141},(_,k)=>k+40),  fmt:v=>`${v} kg`, inicio:70}
+};
+const sheet=$('sheet'), sheetList=$('sheetList'); let sheetBtn=null;
+function openSheet(btn){
+  const c=CFG.selects[btn.id]; sheetBtn=btn;
+  $('sheetTtl').textContent=btn.dataset.title;
+  sheetList.innerHTML=c.vals.map(v=>`<li><button type="button" role="option" data-v="${v}" aria-selected="${String(btn.value)===String(v)}">${c.fmt(v)}</button></li>`).join('');
+  sheet.hidden=false; btn.setAttribute('aria-expanded','true');
+  const panel=sheet.querySelector('.panel');
+  if(window.matchMedia('(max-width:640px)').matches){ panel.style.cssText=''; }
+  else{
+    const r=btn.getBoundingClientRect(), maxH=260, below=innerHeight-r.bottom-12;
+    const up=below<maxH && r.top>below;
+    panel.style.left=r.left+'px'; panel.style.width=Math.max(r.width,150)+'px'; panel.style.maxHeight=maxH+'px';
+    panel.style.top=up?'auto':(r.bottom+6)+'px'; panel.style.bottom=up?(innerHeight-r.top+6)+'px':'auto';
+  }
+  const sel=sheetList.querySelector('[aria-selected="true"]')||sheetList.querySelector(`[data-v="${c.inicio}"]`)||sheetList.querySelector('button');
+  sel.focus({preventScroll:true}); sel.scrollIntoView({block:'center'});
+}
+function closeSheet(){ if(sheet.hidden) return; sheet.hidden=true; if(sheetBtn){ sheetBtn.setAttribute('aria-expanded','false'); sheetBtn.focus({preventScroll:true}); } sheetBtn=null; }
+sheet.querySelector('.back').onclick=closeSheet;
+sheetList.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b||!sheetBtn) return;
+  const btn=sheetBtn, c=CFG.selects[btn.id];
+  btn.value=b.dataset.v; btn.querySelector('.ph,.val')?.remove();
+  const s=document.createElement('span'); s.className='val'; s.textContent=c.fmt(+b.dataset.v); btn.insertBefore(s,btn.firstChild);
+  $('err'+btn.id[0].toUpperCase()+btn.id.slice(1)).hidden=true;
+  closeSheet();
+});
+sheet.addEventListener('keydown',e=>{
+  const items=[...sheetList.querySelectorAll('button')], cur=items.indexOf(document.activeElement);
+  if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); closeSheet(); }
+  else if(e.key==='ArrowDown'){ e.preventDefault(); items[Math.min(cur+1,items.length-1)].focus(); }
+  else if(e.key==='ArrowUp'){ e.preventDefault(); items[Math.max(cur-1,0)].focus(); }
+  else if(e.key==='Home'){ e.preventDefault(); items[0].focus(); }
+  else if(e.key==='End'){ e.preventDefault(); items.at(-1).focus(); }
+  else if(e.key==='Tab'){ e.preventDefault(); }
+});
+['idade','altura','peso'].forEach(id=>$(id).onclick=()=>openSheet($(id)));
+addEventListener('resize',closeSheet);
+
 // ---------- Fluxo inicial ----------
 $('btnAgeExit').onclick=()=>{location.href='about:blank';};
 $('btnAgeOk').onclick=()=>go('mode');
@@ -524,7 +608,7 @@ $('btnIntroBack').onclick=()=>go('mode');
 document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>{ modo=b.dataset.modo; go('intro'); $('apelido').focus({preventScroll:true}); });
 
 function validar(){
-  const idade=parseInt($('idade').value,10), altura=parseInt($('altura').value,10), peso=parseFloat($('peso').value);
+  const idade=parseInt($('idade').value,10), altura=parseInt($('altura').value,10), peso=parseFloat($('peso').value);   // vêm das listas suspensas
   const bad={
     errGenero:!genero,
     errIdade:!(idade>=18&&idade<=120),
@@ -557,6 +641,7 @@ function render(){
     b.type='button'; b.className='option'+(resp[i]===k?' sel':''); b.setAttribute('role','radio'); b.setAttribute('aria-checked',resp[i]===k);
     b.innerHTML=`<span class="k">${k+1}</span><span>${esc(lab)}</span>`;
     b.onclick=()=>pick(k);
+    b.ondblclick=()=>{ mark(k); next(); };
     box.appendChild(b);
   });
   $('stepLabel').textContent=`Pergunta ${i+1} de ${total}`;
@@ -565,10 +650,15 @@ function render(){
   $('btnNext').disabled=(resp[i]===null);
   $('btnBack').disabled=(i===0);
 }
-function pick(k){
+function mark(k){
   clearTimeout(timer);
-  resp[i]=k; render();
-  timer=setTimeout(next,280);     // avança sozinho
+  resp[i]=k;
+  [...$('options').children].forEach((b,n)=>{ b.classList.toggle('sel',n===k); b.setAttribute('aria-checked',n===k); });
+  $('btnNext').disabled=false;
+}
+function pick(k){
+  mark(k);
+  if(CFG.avancarAoMarcar) timer=setTimeout(next,280);
 }
 function next(){
   clearTimeout(timer);
@@ -591,7 +681,15 @@ document.addEventListener('keydown',e=>{
     return;
   }
   if(screens.quiz.hidden||/INPUT|TEXTAREA/.test(e.target.tagName)) return;
+  const opts=[...$('options').children], cur=opts.indexOf(document.activeElement);
   if(/^[1-9]$/.test(e.key)){ const n=+e.key-1; if(n<lista[i].opcoes.length) pick(n); }
+  else if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+    e.preventDefault();
+    const n=e.key==='ArrowDown'?Math.min(cur+1,opts.length-1):Math.max(cur<0?0:cur-1,0);
+    opts[n].focus();
+  }
+  else if(e.key===' '&&cur<0){ e.preventDefault(); (opts[resp[i]??0]).focus(); }   // Espaço sem foco: vai para as opções
+  else if(e.key==='Enter'&&cur>=0){ e.preventDefault(); mark(cur); next(); }          // Enter na opção marca e avança
   else if(e.key==='ArrowLeft') back();
   else if(e.key==='ArrowRight'&&resp[i]!==null) next();
 });
@@ -704,6 +802,16 @@ const photo=(()=>{
   const exists=u=>new Promise(r=>{const m=new Image(); m.onload=()=>r(true); m.onerror=()=>r(false); m.src=u;});
   async function firstOf(urls){ for(const u of urls) if(await exists(u)) return u; return null; }
   async function random(){
+    if(F.lista&&F.lista.length){
+      for(let t=0;t<14;t++){
+        const n=Math.floor(Math.random()*F.lista.length);
+        if(used.has(n)&&used.size<F.lista.length) continue;
+        used.add(n);
+        const u=`${F.pasta}/${F.lista[n]}`;
+        if(await exists(u)) return u;
+      }
+      return null;
+    }
     for(let t=0;t<14;t++){
       const n=1+Math.floor(Math.random()*F.total);
       if(used.has(n)&&used.size<F.total) continue;
@@ -735,16 +843,19 @@ const photo=(()=>{
 
 function setFocus(on){
   document.body.classList.toggle('focus',on);
-  $('focusBar').hidden=!on;
-  $('btnFoto').setAttribute('aria-pressed',on);
+  $('arrPrev').hidden=$('arrNext').hidden=!on;
+  const f=$('btnFoto'); f.setAttribute('aria-pressed',on); f.textContent=on?'Voltar para o quiz':'Ver foto';
   if(!on) window.scrollTo({top:0});
 }
-$('btnFoto').onclick=e=>{e.stopPropagation(); setFocus(true);};
-$('fbBack').onclick=e=>{e.stopPropagation(); setFocus(false);};
-$('fbNext').onclick=e=>{e.stopPropagation(); photo.next();};
-$('fbPrev').onclick=e=>{e.stopPropagation(); photo.prev();};
-document.body.addEventListener('click',e=>{
-  if(document.body.classList.contains('focus')&&!e.target.closest('#focusBar')) photo.next(); // toque na foto = próxima
+$('btnFoto').onclick=()=>setFocus(!document.body.classList.contains('focus'));
+$('arrNext').onclick=()=>photo.next();
+$('arrPrev').onclick=()=>photo.prev();
+
+// Duplo clique (ou duplo toque) na foto de fundo, fora do card, abre o modo "Ver foto"
+document.body.addEventListener('dblclick',e=>{
+  if(document.body.classList.contains('focus')||e.target.closest('.card,.top,#fotoDock,.arrow,#sheet')||$('btnFoto').hidden) return;
+  window.getSelection&&window.getSelection().removeAllRanges();
+  setFocus(true);
 });
 
 photo.init();
