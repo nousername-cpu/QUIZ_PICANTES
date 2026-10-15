@@ -225,6 +225,16 @@ body.focus #fotoDock .btn:hover{background:var(--accent-hi)}
       </div>
     </div>
 
+    <!-- Retomar -->
+    <div id="s-resume" hidden>
+      <h2>Continuar de onde parou?</h2>
+      <p class="lead" id="resumeTxt"></p>
+      <div class="nav">
+        <button id="btnRedo" class="btn" type="button">Refazer</button>
+        <button id="btnResume" class="btn primary" type="button">Continuar</button>
+      </div>
+    </div>
+
     <!-- 2. Modo -->
     <div id="s-mode" hidden>
       <h2>Como você quer responder?</h2>
@@ -512,8 +522,8 @@ let lista=[], total=0, resp=[], modo='';
 const user={apelido:'',genero:'',idade:null,altura:null,peso:null};
 let i=0, timer=null, sent=false;
 
-const screens={age:$('s-age'),mode:$('s-mode'),intro:$('s-intro'),quiz:$('s-quiz'),result:$('s-result')};
-const labels={age:'Maiores de 18',mode:'Modo do quiz',intro:'Seus dados',result:'Concluído'};
+const screens={resume:$('s-resume'),age:$('s-age'),mode:$('s-mode'),intro:$('s-intro'),quiz:$('s-quiz'),result:$('s-result')};
+const labels={resume:'Quiz em andamento',age:'Maiores de 18',mode:'Modo do quiz',intro:'Seus dados',result:'Concluído'};
 const order=['age','mode','intro','quiz','result'];
 let reached=0;
 
@@ -535,7 +545,7 @@ function go(n){
   document.querySelectorAll('#menu button').forEach(b=>{
     const idx=order.indexOf(b.dataset.go), cur=b.dataset.go===n;
     b.classList.toggle('cur',cur);
-    b.classList.toggle('done',!cur&&idx<=reached&&n!=='result'&&b.dataset.go!=='result');
+    b.classList.toggle('done',!cur&&idx<=reached&&n!=='result'&&n!=='resume'&&b.dataset.go!=='result');
     if(cur) b.setAttribute('aria-current','step'); else b.removeAttribute('aria-current');
   });
   window.scrollTo({top:0,behavior:'auto'});
@@ -545,6 +555,21 @@ $('menu').addEventListener('click',e=>{
   const n=b.dataset.go;
   if(n==='quiz'){ go('quiz'); render(); } else go(n);
 });
+
+// ---------- Salvar progresso (continua após atualizar a página) ----------
+const KEY='quiz18-progresso';
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify({modo,user,resp,i})); }catch(e){} }
+function clearState(){ try{ localStorage.removeItem(KEY); }catch(e){} }
+function loadState(){
+  try{
+    const s=JSON.parse(localStorage.getItem(KEY)||'null');
+    if(!s||!s.user||!Array.isArray(s.resp)) return null;
+    const l=buildLista(s.modo,s.user.genero);
+    if(l.length!==s.resp.length||!s.resp.some(v=>v!==null)) return null;
+    return {...s,lista:l};
+  }catch(e){ return null; }
+}
+function buildLista(m,g){ return [...(CFG.dote[g]||[]), ...CFG.perguntas.filter(q=>m==='completo'||q.c)]; }
 
 // ---------- Chips ----------
 function chips(wrap,list,onPick){
@@ -627,9 +652,9 @@ function validar(){
 function start(){
   if(!validar()) return;
   // dote (conforme o gênero) vem primeiro; depois as perguntas do modo escolhido
-  lista=[...(CFG.dote[user.genero]||[]), ...CFG.perguntas.filter(q=>modo==='completo'||q.c)];
+  lista=buildLista(modo,user.genero);
   total=lista.length; resp=new Array(total).fill(null); i=0;
-  go('quiz'); render();
+  go('quiz'); render(); save();
 }
 $('btnStart').onclick=start;
 screens.intro.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.tagName==='INPUT') start(); });
@@ -655,7 +680,7 @@ function render(){
 }
 function mark(k){
   clearTimeout(timer);
-  resp[i]=k;
+  resp[i]=k; save();
   [...$('options').children].forEach((b,n)=>{ b.classList.toggle('sel',n===k); b.setAttribute('aria-checked',n===k); });
   $('btnNext').disabled=false;
 }
@@ -666,11 +691,11 @@ function pick(k){
 function next(){
   clearTimeout(timer);
   if(i<total-1){
-    i++; render(); $('question').focus({preventScroll:true});
+    i++; render(); save(); $('question').focus({preventScroll:true});
     if(i%CFG.fotos.trocarACada===0) photo.next();
   } else finish();
 }
-function back(){ clearTimeout(timer); if(i>0){ i--; render(); } }
+function back(){ clearTimeout(timer); if(i>0){ i--; render(); save(); } }
 $('btnNext').onclick=next;
 $('btnBack').onclick=back;
 $('btnSkip').onclick=next;
@@ -733,6 +758,7 @@ function payload(){
   return p;
 }
 function finish(){
+  clearState();
   go('result');
   $('resTitle').textContent=user.apelido?`Pronto, ${user.apelido}!`:'Pronto!';
   $('finalMessage').textContent=CFG.finalMessage||'';
@@ -884,7 +910,18 @@ document.body.addEventListener('dblclick',e=>{
 });
 
 photo.init();
-go('age');
+const saved=loadState();
+if(saved){
+  const feitas=saved.resp.filter(v=>v!==null).length;
+  $('resumeTxt').textContent=`Você já respondeu ${feitas} de ${saved.resp.length} perguntas.`;
+  $('btnResume').onclick=()=>{
+    modo=saved.modo; Object.assign(user,saved.user); genero=user.genero;
+    lista=saved.lista; total=lista.length; resp=saved.resp; i=Math.min(saved.i,total-1);
+    go('quiz'); render(); save();
+  };
+  $('btnRedo').onclick=()=>{ clearState(); go('mode'); };
+  go('resume');
+} else go('age');
 })();
 </script>
 </body>
